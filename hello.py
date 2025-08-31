@@ -6,7 +6,7 @@ app = FastAPI()
 def greet(who):
     return f"Hello, {who}!"
 
-@app.post("/hipost/")
+@app.post("/hipost")
 def greet_post(who: str = Body(embed=True)):
     return f"Hello again, {who}!!"
 
