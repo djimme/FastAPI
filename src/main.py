@@ -1,6 +1,11 @@
 from fastapi import FastAPI
+from web import explorer, creature
+import uvicorn
 
 app = FastAPI()
+
+app.include_router(explorer.router)
+app.include_router(creature.router)
 
 @app.get("/")
 def top():
@@ -10,6 +15,5 @@ def top():
 def echo(thing):
     return f"echoing {thing}"
 
-if __name__ == "__main__":
-    import uvicorn
+if __name__ == "__main__":    
     uvicorn.run("main:app", reload=True)
