@@ -5,6 +5,7 @@ import service.creature as service
 
 router = APIRouter(prefix="/creature")
 
+@router.get("")
 @router.get("/")
 def get_all() -> list[Creature]:
     return service.get_all()
@@ -14,6 +15,7 @@ def get_one(name) -> Creature | None:
     return service.get_one(name)
 
 # 나머지 엔드포인트. 현재는 아무일도 하지 않는다. 
+@router.post("")
 @router.post("/")
 def create(creature:Creature) -> Creature:
     return service.create(creature)

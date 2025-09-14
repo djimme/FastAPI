@@ -25,14 +25,14 @@ def get_one(name: str) -> Explorer:
 
 def get_all() -> list[Explorer]:
     qry = "select * from explorer"
-    rows = curs.fetchall()
+    rows = curs.execute(qry)
     return [row_to_model(row) for row in rows]
 
 def create(explorer: Explorer) -> Explorer:
     qry = """insert into explorer (name, country, description)
             values (:name, :country, :description)"""
     params = model_to_dict(explorer)
-    _ = curs.execute(qry, params)
+    curs.execute(qry, params)
     return get_one(explorer.name)
 
 def modify(explorer: Explorer) -> Explorer:
