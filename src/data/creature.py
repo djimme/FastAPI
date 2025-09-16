@@ -1,12 +1,5 @@
-# import sqlite3
 from .init import conn, curs
 from model.creature import Creature
-
-"""
-DB_NAME = "cryptid.db"
-conn = sqlite3.connect(database=DB_NAME)
-curs = conn.cursor()
-"""
 
 curs.execute("""create table if not exists creature(
              name text primary key,
@@ -15,10 +8,6 @@ curs.execute("""create table if not exists creature(
              area text,
              aka text)""")
 
-"""
-def init():
-    curs.execute(sql="create table creature(name, description, country, area, aka)")
-"""
 
 def row_to_model(row:tuple) -> Creature:
     name, description, country, area, aka = row
@@ -47,12 +36,13 @@ def get_all() -> list[Creature]:
     return [row_to_model(row) for row in rows]
 
 def create(creature: Creature) -> Creature:
-    qry = "insert into creature values (:name, :description, :country, :area, :aka)"
+    qry = """insert into creature values 
+            (:name, :description, :country, :area, :aka)"""
     params = model_to_dict(creature)
-    curs.execute(qry, params)
+    curs.execute(qry, params)    
     return get_one(creature.name)
 
-def modify(creature: Creature) -> Creature:
+def modify(name: str, creature: Creature) -> Creature:
     qry = """update creature
             set country = :country
                 name = :name
@@ -61,16 +51,16 @@ def modify(creature: Creature) -> Creature:
                 aka = :aka
             where name := name_orig"""
     params = model_to_dict(creature)
-    params["name_orig"] = creature.name
+    params["name_orig"] = name
     _ = curs.execute(qry, params)
     return get_one(creature.name)
 
 def replace(creature: Creature):
     return creature
 
-def delete(creature: Creature) -> bool:
+def delete(name: str) -> bool:
     qry = "delete from creature where name = :name"
-    params = {"name": creature.name}
+    params = {"name": name}
     res = curs.execute(qry, params)
     return bool(res)
 

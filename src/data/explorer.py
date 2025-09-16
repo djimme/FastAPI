@@ -25,7 +25,8 @@ def get_one(name: str) -> Explorer:
 
 def get_all() -> list[Explorer]:
     qry = "select * from explorer"
-    rows = curs.execute(qry)
+    curs.execute(qry)
+    rows = list(curs.fetchall())
     return [row_to_model(row) for row in rows]
 
 def create(explorer: Explorer) -> Explorer:
@@ -35,7 +36,7 @@ def create(explorer: Explorer) -> Explorer:
     curs.execute(qry, params)
     return get_one(explorer.name)
 
-def modify(explorer: Explorer) -> Explorer:
+def modify(name: str, explorer: Explorer) -> Explorer:
     qry = """update explorer 
             set country=:country,
                 name=:name,
@@ -43,12 +44,12 @@ def modify(explorer: Explorer) -> Explorer:
                 where name=:name_orig"""
     
     params = model_to_dict(explorer)
-    params["name_orig"] = explorer.name
+    params["name_orig"] = name
     _ = curs.execute(qry, params)
     return get_one(explorer.name)
 
-def delete(explorer:Explorer) -> bool:
+def delete(name:str) -> bool:
     qry = "delete from explorer where name=:name"
-    params = {"name":explorer.name}
+    params = {"name":name}
     res = curs.execute(qry, params)
     return bool(res)
