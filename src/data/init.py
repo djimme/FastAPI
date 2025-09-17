@@ -17,7 +17,7 @@ def get_db(name:str | None=None, reset:bool = False):
         conn = None
 
     if not name:
-        name = os.getenv("CRYPTID_SQLITE_DB")
+        # name = os.getenv("CRYPTID_SQLITE_DB")
         top_dir = Path(__file__).resolve().parents[1]
         db_dir = top_dir / "db"
         # db_dir.mkdir(exist_ok=True)

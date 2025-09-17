@@ -1,5 +1,6 @@
-from .init import curs
+from .init import curs, IntegrityError
 from model.explorer import Explorer
+from error import Missing, Duplicate
 
 curs.execute("""create table if not exists explorer(
                 name text primary key,
@@ -21,7 +22,10 @@ def get_one(name: str) -> Explorer:
     params = {"name":name}
     curs.execute(qry, params)
     row = curs.fetchone()
-    return row_to_model(row)
+    if row:
+        return row_to_model(row)
+    else:
+        raise Missing(msg=f"Explorer '{name}' not found")
 
 def get_all() -> list[Explorer]:
     qry = "select * from explorer"
@@ -30,13 +34,24 @@ def get_all() -> list[Explorer]:
     return [row_to_model(row) for row in rows]
 
 def create(explorer: Explorer) -> Explorer:
+    if not explorer:
+        return None
+    
     qry = """insert into explorer (name, country, description)
             values (:name, :country, :description)"""
     params = model_to_dict(explorer)
-    curs.execute(qry, params)
+
+    try:
+        curs.execute(qry, params)
+    except IntegrityError as e:
+        raise Duplicate(msg = f"Explorer '{explorer.name}' already exists") from e
+    
     return get_one(explorer.name)
 
 def modify(name: str, explorer: Explorer) -> Explorer:
+    if not (name and explorer):
+        return None
+    
     qry = """update explorer 
             set country=:country,
                 name=:name,
@@ -46,10 +61,20 @@ def modify(name: str, explorer: Explorer) -> Explorer:
     params = model_to_dict(explorer)
     params["name_orig"] = name
     _ = curs.execute(qry, params)
-    return get_one(explorer.name)
+
+    if curs.rowcount == 1:
+        return get_one(explorer.name)
+    else:
+        raise Missing(msg= f"Explorer '{name}' not found")
 
 def delete(name:str) -> bool:
+    if not name:
+        return False
     qry = "delete from explorer where name=:name"
     params = {"name":name}
     res = curs.execute(qry, params)
+
+    if curs.rowcount != 1:
+        raise Missing(msg=f"Explorer '{name}' not found")
+    
     return bool(res)
