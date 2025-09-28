@@ -4,13 +4,13 @@ from error import Missing, Duplicate
 
 curs.execute(""" create table if not exists
              user(
-             name test primary key,
-             hast tet)""")
+             name text primary key,
+             hash text)""")
 
 curs.execute("""create table if not exists
              xuser(
              name text primary key,
-             hash test)""")
+             hash text)""")
 
 # is_public 인자에 따라 나가는 모델이 분기된다.
 def row_to_model(row:tuple, is_public:bool = True) -> PublicUser | PrivateUser:
